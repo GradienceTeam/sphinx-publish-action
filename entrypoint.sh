@@ -14,6 +14,14 @@ if [ -z "${INPUT_TOKEN}" ] && [ "${INPUT_BUILD_ONLY}" != true ]; then
   exit 1
 fi
 
+if [ -z "$PAT_TOKEN" ]; then
+	TOKEN=$GITHUB_TOKEN
+else
+	TOKEN=$PAT_TOKEN
+fi
+
+
+
 if [ -n "${INPUT_SPHINX_SRC}" ]; then
   SPHINX_SRC="${INPUT_SPHINX_SRC}"
   echo "::debug::Source directory is set via input parameter"
@@ -168,12 +176,19 @@ touch .nojekyll
 
 echo "Publishing to ${GITHUB_REPOSITORY} on branch ${remote_branch}"
 
-git config user.name "${GITHUB_ACTOR}" && \
-git config user.email "${GITHUB_ACTOR}@users.noreply.github.com" && \
-git add . && \
-git commit $COMMIT_OPTIONS -m "Sphinx build from Action ${GITHUB_SHA}" && \
-git push "https://x-access-token:$GITHUB_TOKEN@github.com/$REPO_NAME" $LOCAL_BRANCH:$remote_branch && \
-rm -fr .git && \
-cd ..
 
+if [ "$(git status $PO_DIR --porcelain)" != "" ]; then
+	echo "🔼 Pushing to repository"
+  git add .
+	git commit $COMMIT_OPTIONS -m "Sphinx build from Action ${GITHUB_SHA}"
+	if [ "$FORK" == true ]; then
+		echo "debug: $REPO_NAME"
+		git config credential.https://github.com/.helper "! f() { echo username=x-access-token; echo password=$TOKEN; };f"
+		git push "https://x-access-token:$TOKEN@github.com/$REPO_NAME"
+	else
+		git push "https://x-access-token:$GITHUB_TOKEN@github.com/$REPO_NAME" $LOCAL_BRANCH:$remote_branch
+	fi
+else
+	echo "☑️ No changes are required to .po files"
+fi
 exit $?
