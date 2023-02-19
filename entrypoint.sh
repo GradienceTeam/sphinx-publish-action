@@ -183,8 +183,8 @@ echo "Publishing to ${GITHUB_REPOSITORY} on branch ${remote_branch}"
 
 if [ "$(git status $PO_DIR --porcelain)" != "" ]; then
 	echo "🔼 Pushing to repository"
-  git add .
-	git commit $COMMIT_OPTIONS -m "Sphinx build from Action ${GITHUB_SHA}"
+  	git add .
+	git commit -m "Sphinx build from Action ${GITHUB_SHA}"
 	if [ "$FORK" == true ]; then
 		echo "debug: $REPO_NAME"
 		git config credential.https://github.com/.helper "! f() { echo username=x-access-token; echo password=$TOKEN; };f"
