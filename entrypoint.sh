@@ -3,6 +3,7 @@ set -e
 
 echo "Starting the Sphinx Action"
 
+REPO_NAME="$GITHUB_REPOSITORY"
 if [ -n "$INPUT_PRE_BUILD_COMMANDS" ]; then
   echo "Execute pre-build commands specified by the user."
   eval "$INPUT_PRE_BUILD_COMMANDS"
@@ -171,7 +172,7 @@ git config user.name "${GITHUB_ACTOR}" && \
 git config user.email "${GITHUB_ACTOR}@users.noreply.github.com" && \
 git add . && \
 git commit $COMMIT_OPTIONS -m "Sphinx build from Action ${GITHUB_SHA}" && \
-git push $PUSH_OPTIONS $REMOTE_REPO $LOCAL_BRANCH:$remote_branch && \
+git push "https://x-access-token:$GITHUB_TOKEN@github.com/$REPO_NAME" $LOCAL_BRANCH:$remote_branch && \
 rm -fr .git && \
 cd ..
 
