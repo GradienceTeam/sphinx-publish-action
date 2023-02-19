@@ -20,6 +20,10 @@ else
 	TOKEN=$PAT_TOKEN
 fi
 
+# Setup Git config and push .pot file to github repo
+git config --global user.name "Gradience Bot"
+git config --global user.email "AdwCustomizerTeam@proton.me"
+git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
 
 if [ -n "${INPUT_SPHINX_SRC}" ]; then
